@@ -33,7 +33,6 @@ public class SimpleClient {
 
     //methods
     public void run(){
-        mRun = true;
 
         try {
             InetAddress serverAddr = InetAddress.getByName(ip);
@@ -41,15 +40,11 @@ public class SimpleClient {
 
             Socket socket = new Socket(serverAddr, port);
             try {
-
                 //receive the message which the server sends back
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 //in this while the client listens for the messages sent by the server
-                while (mRun) {
-                    serverMessage = in.readLine();
-                }
-
+                serverMessage = in.readLine();
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
 
             } catch (Exception e) {
