@@ -40,6 +40,7 @@ public class SimpleClient {
     }
 
     public void run(){
+        mRun = true;
 
         try {
             InetAddress serverAddr = InetAddress.getByName(ip);
