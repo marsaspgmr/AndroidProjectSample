@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     TextView dialogTextView = null;
     TextView cdsTextView = null;
+    int connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress(message);
                 }
             });
-            mSimpleClient.run();
+            connection = mSimpleClient.run();
+            //se la connessione al server è riuscita
+                //traccia la posizione del dispositivo
 
             return null;
         }

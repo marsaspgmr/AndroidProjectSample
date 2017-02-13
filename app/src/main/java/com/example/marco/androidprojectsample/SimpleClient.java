@@ -16,6 +16,8 @@ public class SimpleClient {
     private MonitorMessage monitorMessage = null;
     public static final String DEF_SERVERIP = "192.168.1.102"; //Server IP default address
     public static final int DEF_SERVERPORT = 9999; ////Server port default address
+    public static final int CONNECTION_SUCCESSFULL = 100;
+    public static final int CONNECTION_FAILED = 001;
     private String ip = null;
     private int port = 0;
     BufferedReader in;
@@ -39,9 +41,10 @@ public class SimpleClient {
         mRun = false;
     }
 
-    public void run(){
-        mRun = true;
+    //return 0 if connection is successfull 1 if connection not estabilished
+    public int run(){
 
+        mRun = true;
         try {
             InetAddress serverAddr = InetAddress.getByName(ip);
             Log.e("SimpleClient", "Connecting...");
@@ -63,11 +66,12 @@ public class SimpleClient {
 
                 }
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
+                monitorMessage.returnMessage("Cannot connect to Server");
+                monitorMessage.returnMessage("Re-trying...");
+                return run();
 
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket
@@ -76,10 +80,11 @@ public class SimpleClient {
             }
 
         } catch (Exception e) {
-
-            Log.e("TCP", "C: Error", e);
-
+            monitorMessage.returnMessage("Cannot connect to Server.2");
+            monitorMessage.returnMessage("Re-trying...");
+            return run();
         }
+        return CONNECTION_SUCCESSFULL;
     }
 
 
