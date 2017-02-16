@@ -16,11 +16,12 @@ public class SimpleClient {
     private MonitorMessage monitorMessage = null;
     public static final String DEF_SERVERIP = "192.168.1.102"; //Server IP default address
     public static final int DEF_SERVERPORT = 9999; ////Server port default address
-    public static final int CONNECTION_SUCCESSFULL = 100;
-    public static final int CONNECTION_FAILED = 001;
+    public static final int MAX_TRIES_TO_CONNECT = 3;
+    public static final int TIMEOUT = 10000;
     private String ip = null;
     private int port = 0;
     BufferedReader in;
+    private Socket socket;
 
 
     //constructors
@@ -41,15 +42,16 @@ public class SimpleClient {
         mRun = false;
     }
 
-    //return 0 if connection is successfull 1 if connection not estabilished
-    public int run(){
+    //return 100 if connection is successfull
+    public Socket run(){
 
         mRun = true;
         try {
             InetAddress serverAddr = InetAddress.getByName(ip);
             Log.e("SimpleClient", "Connecting...");
 
-            Socket socket = new Socket(serverAddr, port);
+            socket = new Socket(serverAddr, port);
+            socket.setSoTimeout(TIMEOUT);
             try {
                 //receive the message which the server sends back
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -65,14 +67,10 @@ public class SimpleClient {
                     serverMessage = null;
 
                 }
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
-                monitorMessage.returnMessage("Cannot connect to Server");
-                monitorMessage.returnMessage("Re-trying...");
-                return run();
-
+                monitorMessage.returnMessage(e.toString());
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
@@ -80,11 +78,10 @@ public class SimpleClient {
             }
 
         } catch (Exception e) {
-            monitorMessage.returnMessage("Cannot connect to Server.2");
-            monitorMessage.returnMessage("Re-trying...");
-            return run();
+            Log.e("TCP", "S: Error", e);
+            monitorMessage.returnMessage(e.toString());
         }
-        return CONNECTION_SUCCESSFULL;
+        return socket;
     }
 
 
@@ -97,4 +94,5 @@ public class SimpleClient {
     public void setIp(String ip) {
         this.ip = ip;
     }
+
 }

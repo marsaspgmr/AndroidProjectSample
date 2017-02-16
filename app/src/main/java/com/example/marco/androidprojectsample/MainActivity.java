@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.net.Socket;
 
 
 public class MainActivity extends AppCompatActivity {
     TextView dialogTextView = null;
     TextView cdsTextView = null;
-    int connection;
+    int triesToConnect = 0;
+    Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         dialogTextView = (TextView) findViewById(R.id.logTextView);
         cdsTextView = (TextView) findViewById(R.id.cdsTextView);
-
+        //GPSTracker gps = new GPSTracker(this);
         new ConnectTask().execute("");
     }
 
@@ -34,9 +36,21 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress(message);
                 }
             });
-            connection = mSimpleClient.run();
-            //se la connessione al server è riuscita
+
+            //connect to server
+            //if connection can't be estabilished retrying for 2 times
+            do {
+                socket = mSimpleClient.run();
+                triesToConnect++;
+                if(triesToConnect > 1)
+                    publishProgress("Trying re-connecting...");
+
+            } while(socket == null &&
+                    triesToConnect < mSimpleClient.MAX_TRIES_TO_CONNECT);
+
+            if(socket.isConnected()){
                 //traccia la posizione del dispositivo
+            }
 
             return null;
         }
